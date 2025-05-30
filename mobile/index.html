@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OCOS Ultra Elite Swap</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+  <link rel="manifest" href="./manifest.json" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Define CSS variables for consistent theming */
+    :root {
+      --bg-dark: #07070A; /* Even darker background */
+      --card-dark: #15171F; /* Slightly lighter dark for card */
+      --text-light: #E8E8E8; /* Light grey for general text */
+      --text-lighter: #FFFFFF; /* Pure white for highlights */
+      --accent-gold: #E0B95B; /* Rich, luxurious gold color */
+      --accent-teal: #00C2A8; /* Vibrant, professional teal */
+      --border-dark: #2A2D35; /* Dark grey for subtle borders */
+      --shadow-dark: rgba(0, 0, 0, 0.6); /* Deep, soft shadow */
+      --shadow-teal: rgba(0, 194, 168, 0.4); /* Teal shadow for buttons */
+      --glow-gold: rgba(224, 185, 91, 0.3); /* Glow for gold accent */
+    }
+
+    /* Base body styling for full-page dark background and centering */
+    body {
+      font-family: 'Montserrat', sans-serif; /* Elegant sans-serif font */
+      background: var(--bg-dark);
+      color: var(--text-light);
+      margin: 0;
+      padding: 4rem; /* Generous padding around the content */
+      display: flex; /* Use flexbox for centering */
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh; /* Full viewport height */
+      line-height: 1.7; /* Improved readability */
+      overflow: hidden; /* Prevent scrollbar from rotating gradient */
+      transition: background-color 0.5s ease; /* Background color transition */
+    }
+
+    /* Main container for the swap interface */
+    .container {
+      max-width: 480px; /* Increased max-width for a more substantial feel */
+      width: 100%; /* Ensure it's responsive */
+      background: var(--card-dark);
+      padding: 40px; /* More padding inside the card */
+      border-radius: 24px; /* Larger border-radius for softer edges */
+      box-shadow: 0 15px 40px var(--shadow-dark); /* Deeper, softer shadow */
+      border: 1px solid var(--border-dark); /* Subtle border */
+      position: relative; /* Needed for pseudo-element gradient */
+      overflow: hidden; /* Clip the rotating gradient */
+      z-index: 1; /* Ensure content is above the gradient */
+      transform: scale(1);
+      animation: fadeInScale 0.8s ease-out forwards; /* Initial subtle growth animation */
+    }
+
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Pseudo-element for the rotating gold gradient background */
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -70%;
+      left: -70%;
+      width: 240%;
+      height: 240%;
+      background: radial-gradient(circle at center, var(--glow-gold) 0%, rgba(224, 185, 91, 0) 60%); /* Subtle gold glow */
+      transform: rotate(0deg); /* Initial rotation */
+      animation: rotateGradient 25s linear infinite; /* Continuous, slow rotation */
+      z-index: -1; /* Place behind content */
+      opacity: 0.6; /* Transparency for a more subtle effect */
+    }
+
+    /* Keyframe animation for the rotating gradient */
+    @keyframes rotateGradient {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Heading styling */
+    h2 {
+      font-family: 'Playfair Display', serif; /* Elegant serif font for heading */
+      text-align: center;
+      color: var(--accent-gold); /* Gold color for luxury */
+      margin-bottom: 2.5rem; /* More space below heading */
+      font-size: 2.5rem; /* Larger font size */
+      letter-spacing: 1.5px; /* Pronounced letter spacing */
+      text-shadow: 0 0 12px var(--glow-gold); /* Soft glow for the gold text */
+      font-weight: 700;
+    }
+
+    /* Styling for all form elements (buttons, select, input) */
+    button, select, input {
+      width: 100%;
+      padding: 18px; /* Increased padding for a more substantial feel */
+      margin: 18px 0; /* More vertical spacing */
+      border: none;
+      border-radius: 14px; /* Larger border-radius */
+      font-weight: 600; /* Semi-bold text */
+      font-size: 1.15rem; /* Slightly larger font size */
+      transition: all 0.3s ease; /* Smooth transitions for hover/focus effects */
+      box-sizing: border-box; /* Ensures padding is included in width calculation */
+      letter-spacing: 0.5px;
+    }
+
+    /* Button specific styling */
+    button {
+      background: linear-gradient(145deg, var(--accent-teal), #00A38D); /* Gradient background */
+      color: var(--text-lighter); /* Lighter text for contrast */
+      cursor: pointer;
+      box-shadow: 0 8px 20px var(--shadow-teal); /* Teal shadow */
+      text-transform: uppercase; /* Uppercase text */
+      letter-spacing: 1px;
+    }
+
+    /* Button hover effect */
+    button:hover {
+      background: linear-gradient(145deg, #00A38D, var(--accent-teal)); /* Reverse gradient on hover */
+      box-shadow: 0 10px 25px rgba(0, 194, 168, 0.5); /* Deeper shadow */
+      transform: translateY(-3px); /* Slight lift effect */
+    }
+
+    /* Button active (click) effect */
+    button:active {
+      transform: translateY(0); /* Reset position */
+      box-shadow: 0 5px 15px var(--shadow-teal); /* Smaller shadow */
+    }
+
+    /* Input and select specific styling */
+    input, select {
+      background: var(--border-dark); /* Dark background */
+      color: var(--text-lighter); /* Light text color */
+      border: 1px solid var(--border-dark); /* Subtle border */
+      padding-left: 25px; /* More left padding for text */
+      box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.3); /* Inner shadow for depth */
+    }
+
+    /* Placeholder text styling */
+    input::placeholder {
+      color: #777; /* Darker placeholder color */
+      font-weight: 300;
+    }
+
+    /* Focus state for inputs and selects */
+    input:focus, select:focus {
+      outline: none; /* Remove default outline */
+      border-color: var(--accent-gold); /* Gold border on focus */
+      box-shadow: 0 0 0 4px var(--glow-gold), inset 0 3px 8px rgba(0, 0, 0, 0.3); /* Gold glow on focus and inner shadow */
+    }
+
+    /* Custom styling for select dropdown arrow */
+    select {
+      appearance: none; /* Remove default arrow */
+      background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23E8E8E8%22%20d%3D%22M287%2C197.39L159.2%2C69.58c-3.27-3.28-7.58-4.9-12.2-4.9c-4.63%2C0-8.94%2C1.62-12.2%2C4.9L5.39%2C197.39c-6.7%2C6.7-6.7%2C17.51%2C0%2C24.22c6.7%2C6.7%2C17.51%2C6.7%2C24.22%2C0L147%2C101.81l117.4%2C117.4c6.7%2C6.7%2C17.51%2C6.7%2C24.22%2C0C293.7%2C214.9%2C293.7%2C204.09%2C287%2C197.39z%22%2F%3E%3C%2Fsvg%3E');
+      background-repeat: no-repeat;
+      background-position: right 20px center; /* Adjust arrow position */
+      background-size: 18px; /* Size of the custom arrow */
+    }
+
+    /* Log area for messages */
+    #log {
+      margin-top: 30px; /* More space above log */
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.4); /* Semi-transparent dark background */
+      border-radius: 12px;
+      font-size: 1rem;
+      color: #C0C0C0; /* Slightly darker text for log */
+      border: 1px solid var(--border-dark);
+      word-break: break-all; /* Ensures long hashes don't overflow */
+      min-height: 40px; /* Ensure it has some height even when empty */
+      display: flex; /* Use flex for vertical alignment */
+      align-items: center;
+      justify-content: center; /* Center text */
+      text-align: center;
+      font-weight: 500;
+    }
+
+    /* Footer styling */
+    .footer {
+      font-size: 0.85rem;
+      text-align: center;
+      margin-top: 2.5rem; /* More space above footer */
+      color: #777; /* Even darker text for footer */
+      letter-spacing: 0.6px;
+      font-weight: 400;
+    }
+
+    /* Message box for alerts (replaces native alert) */
+    .message-box {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--card-dark);
+      border: 1px solid var(--accent-gold);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 15px 40px var(--shadow-dark);
+      z-index: 1000;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      display: none; /* Hidden by default */
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -45%); }
+      to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+
+    .message-box p {
+      margin-bottom: 25px;
+      font-size: 1.2rem;
+      color: var(--text-lighter);
+      font-weight: 500;
+    }
+
+    .message-box button {
+      background: var(--accent-teal);
+      color: white;
+      padding: 12px 25px;
+      width: auto;
+      margin: 0;
+      font-size: 1.05rem;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    /* Responsive design: Adjustments for smaller screens */
+    @media (max-width: 600px) {
+      body {
+        padding: 1.5rem;
+        align-items: flex-start; /* Align to top on small screens */
+      }
+      .container {
+        padding: 25px;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px var(--shadow-dark);
+      }
+      h2 {
+        font-size: 2rem;
+        margin-bottom: 1.8rem;
+      }
+      button, select, input {
+        padding: 14px;
+        margin: 12px 0;
+        font-size: 1rem;
+        border-radius: 12px;
+      }
+      #log {
+        padding: 15px;
+        font-size: 0.9rem;
+        min-height: 35px;
+      }
+      .footer {
+        font-size: 0.75rem;
+        margin-top: 1.5rem;
+      }
+      .message-box {
+        padding: 20px;
+      }
+      .message-box p {
+        font-size: 1rem;
+      }
+      .message-box button {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>BTC-backed <span style="color: var(--text-light); font-weight: 300;">→</span> OCOS Swap</h2>
+
+    <button onclick="connect()">🔌 Connect Wallet</button>
+
+    <select id="asset">
+      <option value="WBTC">WBTC (Ethereum)</option>
+      <option value="BTCB">BTCB (BSC)</option>
+    </select>
+
+    <input type="number" id="amount" placeholder="BTC amount to swap" />
+
+    <button onclick="swap()">🔁 Initiate Elite Swap</button>
+
+    <div id="log"></div>
+
+    <div class="footer">Robinhood47 • Backed by Real BTC • Elite Decentralized Swaps</div>
+  </div>
+
+  <div id="messageBox" class="message-box">
+    <p id="messageBoxText"></p>
+    <button onclick="hideMessageBox()">OK</button>
+  </div>
+
+  <script>
+    // Define contract address and ABI (replace with actual values)
+    const CONTRACT_ADDRESS = "0xYourDeployedRobinhood47";
+    const ABI = [/* Insert Robinhood47 ABI here */];
+
+    // Global variables for web3 instance and connected account
+    let web3, account;
+
+    // Function to display custom message box
+    function showMessageBox(message) {
+      document.getElementById("messageBoxText").innerText = message;
+      document.getElementById("messageBox").style.display = "block";
+    }
+
+    // Function to hide custom message box
+    function hideMessageBox() {
+      document.getElementById("messageBox").style.display = "none";
+    }
+
+    /**
+     * Connects the user's wallet (MetaMask/Trust Wallet) to the dApp.
+     * Initializes web3 and sets the connected account.
+     */
+    async function connect() {
+      // Check if Ethereum provider (e.g., MetaMask) is available in the window
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum); // Create a new Web3 instance
+        try {
+          // Request accounts from the user's wallet
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          account = accounts[0]; // Set the first connected account
+          // Display truncated account address in the log
+          document.getElementById("log").innerText = "✅ Wallet connected: " + account.substring(0, 6) + "..." + account.substring(account.length - 4);
+        } catch (error) {
+          // Handle errors during connection (e.g., user rejects connection)
+          document.getElementById("log").innerText = "❌ Connection failed: " + error.message;
+          showMessageBox("Connection failed. Please ensure your wallet is unlocked and you've granted permission.");
+        }
+      } else {
+        // If no Ethereum provider is detected, inform the user
+        document.getElementById("log").innerText = "❌ MetaMask/Trust Wallet not detected.";
+        showMessageBox("Please install MetaMask or Trust Wallet to proceed with elite swaps.");
+      }
+    }
+
+    /**
+     * Initiates the swap transaction based on selected asset and amount.
+     * Calls the appropriate contract method (swapWithWBTC or swapWithBTCB).
+     */
+    async function swap() {
+      // Check if a wallet is connected
+      if (!account) {
+        document.getElementById("log").innerText = "Please connect your wallet first.";
+        showMessageBox("Please connect your wallet before attempting a swap.");
+        return;
+      }
+
+      const asset = document.getElementById("asset").value; // Get selected asset (WBTC or BTCB)
+      const amount = document.getElementById("amount").value; // Get amount from input field
+
+      // Validate the amount input
+      if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+        document.getElementById("log").innerText = "Please enter a valid amount to swap.";
+        showMessageBox("Please enter a valid positive BTC amount to swap.");
+        return;
+      }
+
+      // Convert amount to Wei (smallest unit of Ether)
+      const amountWei = web3.utils.toWei(amount, "ether");
+
+      // Create a new contract instance
+      const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
+
+      // Display a pending message in the log
+      document.getElementById("log").innerText = `Initiating swap for ${amount} ${asset}... Please confirm in your wallet.`;
+
+      try {
+        let tx;
+        // Call the appropriate swap method on the smart contract
+        if (asset === "WBTC") {
+          // Note: For ERC-20 tokens like WBTC, users typically need to approve the contract
+          // to spend their tokens before calling a swap function. This example assumes
+          // approval is handled externally or not required by your specific contract logic.
+          // In a real dApp, you'd usually have an "Approve" button before the "Swap" button.
+          tx = await contract.methods.swapWithWBTC(amountWei).send({ from: account });
+        } else {
+          tx = await contract.methods.swapWithBTCB(amountWei).send({ from: account });
+        }
+        // Display success message and truncated transaction hash
+        document.getElementById("log").innerText = `✅ Swap complete!\nTX Hash: ${tx.transactionHash.substring(0, 6)}...${tx.transactionHash.substring(tx.transactionHash.length - 4)}`;
+      } catch (err) {
+        // Handle errors during the transaction (e.g., user rejects transaction, contract error)
+        document.getElementById("log").innerText = "❌ Error during swap: " + err.message;
+        showMessageBox("Swap failed: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
